@@ -17,7 +17,7 @@ public:
     
     inline bool GetExitFlag() const { return exitFlag; }
 
-    void ProcessKBHit();
+    void ProcessKBHit(int amountInputtedCodes);
     void TimeStart();
     void TimeFinish();
 

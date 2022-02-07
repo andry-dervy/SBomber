@@ -10,6 +10,13 @@
 #include <chrono>
 #include <thread>
 
+#if defined(_WIN32) || defined(WIN32)
+#include <conio.h>
+#include <windows.h>
+#endif
+
+#include <cassert>
+
 SBomber::SBomber()
   : exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
@@ -218,26 +225,49 @@ LevelGUI* SBomber::FindLevelGUI() const {
   return nullptr;
 }
 
-void SBomber::ProcessKBHit() {
-  int c = getchar();
+void SBomber::ProcessKBHit(int amountInputtedCodes) {
+  assert(amountInputtedCodes >= 0 && amountInputtedCodes < 4);
 
-  if (c == 224) {
-    c = getchar();
+  if(amountInputtedCodes == 0) return;
+
+#if defined(_WIN32) || defined(WIN32)
+  int c = _getch();
+
+  if (c == 224)
+  {
+      c = _getch();
   }
+#else
+  uint32_t c = 0;
+  uint8_t* p = (uint8_t*)(&c);
+  for (int i = 0; i < amountInputtedCodes; ++i)
+  {
+      *p++ = static_cast<uint8_t>(getchar());
+  }
+#endif
 
-  MyTools::WriteToLog(std::string(__func__) + " was invoked. key = ", c);
+  MyTools::WriteToLog(std::string(__func__) + " was invoked. key = ", static_cast<int>(c));
 
-  switch (c) {
+  switch (c)
+  {
 
-    case 27: // esc
+  case 27: // esc
       exitFlag = true;
       break;
 
+#if defined(_WIN32) || defined(WIN32)
     case 72: // up
+#else
+    case 0x415b1b: // up
+#endif
       FindPlane()->ChangePlaneY(-0.25);
       break;
 
+#if defined(_WIN32) || defined(WIN32)
     case 80: // down
+#else
+    case 0x425b1b: // down
+#endif
       FindPlane()->ChangePlaneY(0.25);
       break;
 

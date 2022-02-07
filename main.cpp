@@ -4,6 +4,11 @@
 
 #include <iostream>
 #include <fstream>
+
+#if defined(_WIN32) || defined(WIN32)
+#include <conio.h>
+#include <windows.h>
+#else
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
@@ -27,6 +32,7 @@ int _kbhit() {
     ioctl(STDIN, FIONREAD, &bytesWaiting);
     return bytesWaiting;
 }
+#endif
 
 int main(void) {
   MyTools::OpenLogFile("log.txt");
@@ -36,9 +42,7 @@ int main(void) {
   do {
     game.TimeStart();
 
-    if (_kbhit()) {
-      game.ProcessKBHit();
-    }
+    game.ProcessKBHit(_kbhit());
 
     ScreenSingleton::getInstance().ClrScr();
 
