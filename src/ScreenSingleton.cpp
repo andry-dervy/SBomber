@@ -33,15 +33,15 @@ IScreen& getInternalInstance() {
 class ScreenSingletonProxy : public IScreen {
 public:
   virtual void ClrScr() override {
-    MyTools::WriteToLog("ClrScr invoke begin");
+    MyTools::LoggerSingleton::getInstance().WriteToLog("ClrScr invoke begin");
     getInternalInstance().ClrScr();
-    MyTools::WriteToLog("ClrScr invoke end");
+    MyTools::LoggerSingleton::getInstance().WriteToLog("ClrScr invoke end");
   }
   virtual void GotoXY(double x, double y) override {
 
-    MyTools::WriteToLog("GotoXY invoke begin");
+    MyTools::LoggerSingleton::getInstance().WriteToLog("GotoXY invoke begin");
     getInternalInstance().GotoXY(x, y);
-    MyTools::WriteToLog("GotoXY invoke end");
+    MyTools::LoggerSingleton::getInstance().WriteToLog("GotoXY invoke end");
   }
   virtual uint16_t GetMaxX() override {
     return getInternalInstance().GetMaxX();

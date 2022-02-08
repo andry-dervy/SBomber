@@ -20,7 +20,7 @@
 SBomber::SBomber()
   : exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
-  MyTools::WriteToLog(std::string(__func__) + " was invoked");
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
   Plane* p = new Plane;
   p->SetDirection(1, 0.1);
@@ -86,7 +86,7 @@ SBomber::~SBomber() {
 }
 
 void SBomber::MoveObjects() {
-  MyTools::WriteToLog(std::string(__func__) + " was invoked");
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
   for (size_t i = 0; i < vecDynamicObj.size(); i++) {
     if (vecDynamicObj[i] != nullptr) {
@@ -96,7 +96,7 @@ void SBomber::MoveObjects() {
 };
 
 void SBomber::CheckObjects() {
-  MyTools::WriteToLog(std::string(__func__) + " was invoked");
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
   CheckPlaneAndLevelGUI();
   CheckBombsAndGround();
@@ -246,12 +246,12 @@ void SBomber::ProcessKBHit(int amountInputtedCodes) {
   }
 #endif
 
-  MyTools::WriteToLog(std::string(__func__) + " was invoked. key = ", static_cast<int>(c));
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked. key = ", static_cast<int>(c));
 
   switch (c)
   {
 
-  case 27: // esc
+    case 27: // esc
       exitFlag = true;
       break;
 
@@ -285,7 +285,7 @@ void SBomber::ProcessKBHit(int amountInputtedCodes) {
 }
 
 void SBomber::DrawFrame() {
-  MyTools::WriteToLog(std::string(__func__) + " was invoked");
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
   for (size_t i = 0; i < vecDynamicObj.size(); i++) {
     if (vecDynamicObj[i] != nullptr) {
@@ -306,7 +306,7 @@ void SBomber::DrawFrame() {
 }
 
 void SBomber::TimeStart() {
-  MyTools::WriteToLog(std::string(__func__) + " was invoked");
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
   startTime = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 }
@@ -317,12 +317,12 @@ void SBomber::TimeFinish() {
   deltaTime = uint16_t(finishTime - startTime);
   passedTime += deltaTime;
 
-  MyTools::WriteToLog(std::string(__func__) + " deltaTime = ", (int)deltaTime);
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " deltaTime = ", (int)deltaTime);
 }
 
 void SBomber::DropBomb() {
   if (bombsNumber > 0) {
-    MyTools::WriteToLog(std::string(__func__) + " was invoked");
+    MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
     Plane* pPlane = FindPlane();
     double x = pPlane->GetX() + 4;
