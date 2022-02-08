@@ -49,6 +49,7 @@ int main(void) {
     game.DrawFrame();
     game.MoveObjects();
     game.CheckObjects();
+    game.RunCommands();
 
     game.TimeFinish();
 

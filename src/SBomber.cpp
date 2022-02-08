@@ -117,7 +117,12 @@ void SBomber::CheckBombsAndGround() {
     if (vecBombs[i]->GetY() >= y) {
       pGround->AddCrater(vecBombs[i]->GetX());
       CheckDestoyableObjects(vecBombs[i]);
-      DeleteDynamicObj(vecBombs[i]);
+
+      std::unique_ptr<CommandDeleteDynamicObj> pDelDynObj =
+          std::make_unique<CommandDeleteDynamicObj>(
+            vecBombs[i], vecDynamicObj
+            );
+      macroCommand.addCommand(std::move(pDelDynObj));
     }
   }
 }
@@ -132,27 +137,12 @@ void SBomber::CheckDestoyableObjects(std::shared_ptr<Bomb> pBomb) {
     const double x2 = x1 + size;
     if (vecDestoyableObjects[i]->isInside(x1, x2)) {
       score += vecDestoyableObjects[i]->GetScore();
-      DeleteStaticObj(vecDestoyableObjects[i]);
-    }
-  }
-}
 
-void SBomber::DeleteDynamicObj(std::shared_ptr<DynamicObject> pObj) {
-  auto it = vecDynamicObj.begin();
-  for (; it != vecDynamicObj.end(); it++) {
-    if (*it == pObj) {
-      vecDynamicObj.erase(it);
-      break;
-    }
-  }
-}
-
-void SBomber::DeleteStaticObj(std::shared_ptr<GameObject> pObj) {
-  auto it = vecStaticObj.begin();
-  for (; it != vecStaticObj.end(); it++) {
-    if (*it == pObj) {
-      vecStaticObj.erase(it);
-      break;
+      std::unique_ptr<CommandDeleteStaticObj> pComDelStatObj =
+          std::make_unique<CommandDeleteStaticObj>(
+            vecDestoyableObjects[i], vecStaticObj
+            );
+      macroCommand.addCommand(std::move(pComDelStatObj));
     }
   }
 }
@@ -257,12 +247,15 @@ void SBomber::ProcessKBHit(int amountInputtedCodes) {
       FindPlane()->ChangePlaneY(0.25);
       break;
 
-    case 'b':
-      DropBomb();
-      break;
-
+    case 'b': // DropBomb
     case 'B':
-      DropBomb();
+      {
+        std::unique_ptr<CommandDropBomb> pComDropBomb =
+            std::make_unique<CommandDropBomb>(
+              FindPlane(),vecDynamicObj,bombsNumber,score
+              );
+        macroCommand.addCommand(std::move(pComDropBomb));
+      }
       break;
 
     default:
@@ -306,19 +299,45 @@ void SBomber::TimeFinish() {
   MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " deltaTime = ", (int)deltaTime);
 }
 
-void SBomber::DropBomb() {
+void SBomber::RunCommands()
+{
+  macroCommand.Run();
+}
+
+void CommandDeleteDynamicObj::Execute()
+{
+  auto it = vecDynamicObj.begin();
+  for (; it != vecDynamicObj.end(); it++) {
+    if (*it == obj) {
+      vecDynamicObj.erase(it);
+      break;
+    }
+  }
+}
+
+void CommandDeleteStaticObj::Execute()
+{
+  auto it = vecStaticObj.begin();
+  for (; it != vecStaticObj.end(); it++) {
+    if (*it == obj) {
+      vecStaticObj.erase(it);
+      break;
+    }
+  }
+}
+
+void CommandDropBomb::Execute() {
   if (bombsNumber > 0) {
     MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
-    std::shared_ptr<Plane> pPlane = FindPlane();
-    double x = pPlane->GetX() + 4;
-    double y = pPlane->GetY() + 2;
+    double x = plane->GetX() + 4;
+    double y = plane->GetY() + 2;
 
     std::shared_ptr<Bomb> pBomb = std::make_unique<Bomb>();
     pBomb->SetDirection(0.3, 1);
     pBomb->SetSpeed(2);
     pBomb->SetPos(x, y);
-    pBomb->SetWidth(SMALL_CRATER_SIZE);
+    pBomb->SetWidth(widthCrater);
 
     vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBomb));
     bombsNumber--;
