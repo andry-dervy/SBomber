@@ -17,6 +17,7 @@ public:
     inline void SetFinishX(uint16_t finishXN) { finishX = finishXN; }
 
     void Draw() const override;
+    std::string ClassID() const override;
 
 private:
 

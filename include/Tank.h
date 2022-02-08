@@ -13,6 +13,7 @@ public:
 	inline uint16_t GetScore() const override { return score; }
 
 	void Draw() const override;
+  std::string ClassID() const override;
 
 private:
 

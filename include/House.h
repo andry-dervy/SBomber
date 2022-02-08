@@ -12,6 +12,7 @@ public:
   }
 
   void Draw() const override;
+  std::string ClassID() const override;
 
 private:
   const uint16_t score = 40;

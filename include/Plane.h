@@ -8,6 +8,7 @@ public:
     void Draw() const override;
 
     inline void ChangePlaneY(double dy) { yDirection += dy; }
+    std::string ClassID() const override;
 
 private:
 

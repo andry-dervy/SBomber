@@ -43,3 +43,7 @@ void Tank::Draw() const
 	ScreenSingleton::getInstance().GotoXY(x,y);
 	cout << " ###########";
 }
+
+std::string Tank::ClassID() const {
+  return "Tank";
+}

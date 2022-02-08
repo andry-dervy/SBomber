@@ -17,3 +17,7 @@ void Plane::Draw() const
     ScreenSingleton::getInstance().GotoXY(x + 3, y + 1);
     std::cout << "////";
 }
+
+std::string Plane::ClassID() const {
+  return "Plane";
+}

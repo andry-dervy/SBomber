@@ -7,4 +7,5 @@ public:
   bool isInside(double xn) const;
 
   virtual void Draw() const override;
+  std::string ClassID() const override;
 };
