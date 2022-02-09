@@ -248,10 +248,19 @@ void SBomber::ProcessKBHit(int amountInputtedCodes) {
       break;
 
     case 'b': // DropBomb
-    case 'B':
       {
         std::unique_ptr<CommandDropBomb> pComDropBomb =
             std::make_unique<CommandDropBomb>(
+              FindPlane(),vecDynamicObj,bombsNumber,score
+              );
+        macroCommand.addCommand(std::move(pComDropBomb));
+      }
+      break;
+
+    case 'B': // DropBombDecorator
+      {
+        std::unique_ptr<CommandDropBombDecorator> pComDropBomb =
+            std::make_unique<CommandDropBombDecorator>(
               FindPlane(),vecDynamicObj,bombsNumber,score
               );
         macroCommand.addCommand(std::move(pComDropBomb));
@@ -340,6 +349,28 @@ void CommandDropBomb::Execute() {
     pBomb->SetWidth(widthCrater);
 
     vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBomb));
+    bombsNumber--;
+    score -= Bomb::BombCost;
+  }
+}
+
+void CommandDropBombDecorator::Execute() {
+  if (bombsNumber > 0) {
+    MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
+
+    double x = plane->GetX() + 4;
+    double y = plane->GetY() + 2;
+
+    std::unique_ptr<Bomb> pBomb = std::make_unique<Bomb>();
+    pBomb->SetDirection(0.3, 1);
+    pBomb->SetSpeed(2);
+    pBomb->SetPos(x, y);
+    pBomb->SetWidth(widthCrater);
+
+    std::shared_ptr<BombDecorator> pBombDecorator =
+        std::make_shared<BombDecorator>(std::move(pBomb));
+
+    vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBombDecorator));
     bombsNumber--;
     score -= Bomb::BombCost;
   }

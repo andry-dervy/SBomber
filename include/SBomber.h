@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <list>
 #include <memory>
 
@@ -59,7 +58,7 @@ public:
         score{aScore}, speedBomb{aSpeedBomb}, widthCrater{aWidthCrater} {}
     void Execute() override;
 
-private:
+protected:
     std::shared_ptr<const Plane> plane;
     std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
     uint16_t& bombsNumber;
@@ -67,6 +66,21 @@ private:
     double speedBomb;
     uint16_t widthCrater;
 };
+
+class CommandDropBombDecorator: public CommandDropBomb
+{
+public:
+    CommandDropBombDecorator(std::shared_ptr<const Plane> pPlane,
+                    std::vector<std::shared_ptr<DynamicObject>>& avecDynamicObj,
+                    uint16_t& aBombsNumber,
+                    int16_t& aScore,
+                    double aSpeedBomb = 1,
+                    uint16_t aWidthCrater = SMALL_CRATER_SIZE)
+      : CommandDropBomb{pPlane,avecDynamicObj,aBombsNumber,
+        aScore, aSpeedBomb, aWidthCrater} {}
+    void Execute() override;
+};
+
 
 class MacroCommand
 {
