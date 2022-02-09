@@ -46,6 +46,10 @@ void Ground::Draw() const
     delete[] buf;
 }
 
+std::string Ground::ClassID() const {
+  return "Ground";
+}
+
 bool Ground::isInsideAnyCrater(double x) const
 {
     bool isInside = false;

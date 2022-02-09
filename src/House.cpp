@@ -42,3 +42,7 @@ void House::Draw() const
 	ScreenSingleton::getInstance().GotoXY(x, y);
 	std::cout << "############";
 }
+
+std::string House::ClassID() const {
+  return "House";
+}

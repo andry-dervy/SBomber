@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 class GameObject {
 public:
@@ -8,6 +9,7 @@ public:
   virtual ~GameObject() = default;
 
   virtual void Draw() const = 0;
+  virtual std::string ClassID() const = 0;
 
   inline void SetPos(double nx, double ny) {
     x = nx;

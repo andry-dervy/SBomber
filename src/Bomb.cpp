@@ -7,3 +7,7 @@ void Bomb::Draw() const {
   ScreenSingleton::getInstance().GotoXY(x, y);
   std::cout << "*";
 }
+
+std::string Bomb::ClassID() const {
+  return "Bomb";
+}

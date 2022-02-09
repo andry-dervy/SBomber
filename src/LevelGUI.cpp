@@ -39,6 +39,9 @@ void LevelGUI::Draw() const
     std::cout << "Score: " << score;
 }
 
+std::string LevelGUI::ClassID() const {
+  return "LevelGUI";
+}
 void  LevelGUI::SetParam(uint64_t passedTimeNew, uint64_t fpsNew, uint16_t bombsNumberNew, int16_t scoreNew)
 {
     passedTime = passedTimeNew;

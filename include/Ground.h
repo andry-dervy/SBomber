@@ -9,6 +9,7 @@ class Ground : public GameObject {
 public:
   Ground() = default;
   void Draw() const override;
+  std::string ClassID() const override;
 
   void AddCrater(double xn);
 

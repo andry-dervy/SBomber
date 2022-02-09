@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "LevelGUI.h"
 #include "Plane.h"
@@ -29,21 +30,21 @@ private:
 
     void CheckPlaneAndLevelGUI();
     void CheckBombsAndGround();
-    void  CheckDestoyableObjects(Bomb* pBomb);
+    void  CheckDestoyableObjects(std::shared_ptr<Bomb> pBomb);
 
-    void  DeleteDynamicObj(DynamicObject * pBomb);
-    void  DeleteStaticObj(GameObject* pObj);
+    void  DeleteDynamicObj(std::shared_ptr<DynamicObject> pObj);
+    void  DeleteStaticObj(std::shared_ptr<GameObject> pObj);
 
-    Ground * FindGround() const;
-    Plane * FindPlane() const;
-    LevelGUI * FindLevelGUI() const;
-    std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
-    std::vector<Bomb*> FindAllBombs() const;
+    std::shared_ptr<Ground> FindGround() const;
+    std::shared_ptr<Plane> FindPlane() const;
+    std::shared_ptr<LevelGUI> FindLevelGUI() const;
+    std::vector<std::shared_ptr<DestroyableGroundObject>> FindDestoyableGroundObjects() const;
+    std::vector<std::shared_ptr<Bomb>> FindAllBombs() const;
 
     void DropBomb();
 
-    std::vector<DynamicObject*> vecDynamicObj;
-    std::vector<GameObject*> vecStaticObj;
+    std::vector<std::shared_ptr<DynamicObject>> vecDynamicObj;
+    std::vector<std::shared_ptr<GameObject>> vecStaticObj;
     
     bool exitFlag;
 
