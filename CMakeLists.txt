@@ -48,6 +48,9 @@ set(SOURCES
 
     include/enums/ConsoleColors.h
     include/enums/CraterSize.h
+
+    include/Tower.h
+    src/Tower.cpp
 )
 
 add_executable(SBomber

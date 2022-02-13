@@ -13,6 +13,7 @@
 #include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
+#include "Tower.h"
 #include "enums/CraterSize.h"
 
 class Command
