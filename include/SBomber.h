@@ -1,9 +1,14 @@
 #pragma once
 
+#include <chrono>
+#include <thread>
 #include <list>
 #include <memory>
 
+#include "MyTools.h"
+#include "ScreenSingleton.h"
 #include "LevelGUI.h"
+#include "House.h"
 #include "Plane.h"
 #include "Bomb.h"
 #include "Ground.h"

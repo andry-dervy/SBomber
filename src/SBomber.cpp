@@ -1,14 +1,5 @@
 
-#include "MyTools.h"
 #include "SBomber.h"
-#include "Bomb.h"
-#include "Ground.h"
-#include "Tank.h"
-#include "House.h"
-#include "ScreenSingleton.h"
-#include "enums/CraterSize.h"
-#include <chrono>
-#include <thread>
 
 #if defined(_WIN32) || defined(WIN32)
 #include <conio.h>
@@ -73,17 +64,6 @@ SBomber::SBomber()
 }
 
 SBomber::~SBomber() {
-//  for (size_t i = 0; i < vecDynamicObj.size(); i++) {
-//    if (vecDynamicObj[i] != nullptr) {
-//      delete vecDynamicObj[i];
-//    }
-//  }
-
-//  for (size_t i = 0; i < vecStaticObj.size(); i++) {
-//    if (vecStaticObj[i] != nullptr) {
-//      delete vecStaticObj[i];
-//    }
-//  }
 }
 
 void SBomber::MoveObjects() {
