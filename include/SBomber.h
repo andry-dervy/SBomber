@@ -86,7 +86,6 @@ public:
     void Execute() override;
 };
 
-
 class MacroCommand
 {
 private:
@@ -151,5 +150,66 @@ private:
     uint64_t startTime, finishTime, passedTime;
     uint16_t bombsNumber, deltaTime, fps;
     int16_t score;
-};
 
+public:
+    class BombIterator
+    {
+    private:
+      size_t indx;
+      const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
+
+    public:
+      BombIterator(const std::vector<std::shared_ptr<DynamicObject>> &avecDynamicObj)
+        :indx(0),vecDynamicObj(avecDynamicObj) {
+        for(;indx < vecDynamicObj.size(); ++indx)
+        {
+          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          {
+            return;
+          }
+        }
+      }
+
+      void reset(){indx = vecDynamicObj.size();}
+
+      BombIterator& operator++() {
+        for(++indx; indx < vecDynamicObj.size(); ++indx)
+        {
+          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          {
+            return *this;
+          }
+        }
+        return *this;
+      }
+
+      bool operator==(BombIterator& it) {
+        if(indx == it.indx) return true;
+        return false;
+      }
+
+      bool operator!=(BombIterator& it) {
+        return !(*this == it);
+      }
+
+      std::shared_ptr<DynamicObject>& operator*() {
+        return const_cast<std::shared_ptr<DynamicObject>&>(vecDynamicObj.at(indx));
+      }
+
+      std::shared_ptr<DynamicObject>& operator->() {
+        return const_cast<std::shared_ptr<DynamicObject>&>(vecDynamicObj.at(indx));
+      }
+
+    };
+
+    BombIterator begin(const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) const {
+      return BombIterator(vecDynamicObj);
+    }
+
+    BombIterator end(const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) const {
+      BombIterator it{vecDynamicObj};
+      it.reset();
+      return it;
+    }
+
+};

@@ -152,10 +152,10 @@ std::shared_ptr<Ground> SBomber::FindGround() const {
 std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() const {
   std::vector<std::shared_ptr<Bomb>> vecBombs;
 
-  for (size_t i = 0; i < vecDynamicObj.size(); i++) {
-    if (vecDynamicObj[i]->ClassID() == "Bomb") {
-      vecBombs.push_back(std::static_pointer_cast<Bomb>(vecDynamicObj[i]));
-    }
+  BombIterator it = begin(vecDynamicObj);
+  BombIterator it_end = end(vecDynamicObj);
+  for (; it != it_end; ++it) {
+      vecBombs.push_back(std::static_pointer_cast<Bomb>(*it));
   }
 
   return vecBombs;
