@@ -4,6 +4,7 @@
 #include <thread>
 #include <list>
 #include <memory>
+#include <iostream>
 
 #include "MyTools.h"
 #include "ScreenSingleton.h"
@@ -130,6 +131,9 @@ public:
     void RunCommands();
 
 private:
+    uint32_t getKeyCode(int amountInputtedCodes);
+    TypeHouse EnterTypeHouse();
+
     void CheckPlaneAndLevelGUI();
     void CheckBombsAndGround();
     void  CheckDestoyableObjects(std::shared_ptr<Bomb> pBomb);

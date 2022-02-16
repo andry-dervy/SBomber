@@ -48,8 +48,17 @@ SBomber::SBomber()
   pTowerAdapter->SetPos(35, groundY - 1);
   vecStaticObj.push_back(std::move(pTowerAdapter));
 
-
-  std::unique_ptr<House> pHouse {new House};
+  HouseBuilderA builder;
+  HouseDirector houseDir;
+  std::shared_ptr<House> pHouse;
+  switch (EnterTypeHouse()) {
+  case TypeHouse::HouseWithPipe:
+    pHouse = houseDir.constructorHouseWithPipe(builder);
+    break;
+  case TypeHouse::HouseWithoutPipe:
+    pHouse = houseDir.constructorHouseWithoutPipe(builder);
+    break;
+  }
   pHouse->SetWidth(13);
   pHouse->SetPos(55, groundY - 1);
   vecStaticObj.push_back(std::move(pHouse));
@@ -181,6 +190,29 @@ std::shared_ptr<LevelGUI> SBomber::FindLevelGUI() const {
   }
 
   return nullptr;
+}
+
+TypeHouse SBomber::EnterTypeHouse() {
+  std::cout << "Enter '1' to build House with a pipe." << std::endl;
+  std::cout << "Enter '2' to build House without a pipe." << std::endl;
+  std::cout << " < ";
+
+  uint32_t c;
+  std::cin >> c;
+
+  MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked. key = ", static_cast<int>(c));
+
+  switch (c)
+  {
+    case 1: // HouseWithPipe
+      return TypeHouse::HouseWithPipe;
+
+    case 2: // HouseWithoutPipe
+      return TypeHouse::HouseWithoutPipe;
+
+    default:
+      return TypeHouse::HouseWithPipe;
+  }
 }
 
 void SBomber::ProcessKBHit(int amountInputtedCodes) {
