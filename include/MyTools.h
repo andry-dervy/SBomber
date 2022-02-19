@@ -2,6 +2,12 @@
 
 #include <string>
 #include <cstring>
+#include <chrono>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <sstream>
 
 namespace MyTools {
 
@@ -29,7 +35,7 @@ public:
   virtual void WriteToLog(const std::string& str, double d);
 
 private:
-  static std::ofstream logOut;
+  std::ofstream logOut;
 
   FileLoggerSingletone() = default;
   ~FileLoggerSingletone() = default;

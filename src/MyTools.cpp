@@ -1,17 +1,8 @@
 #include "MyTools.h"
 
-#include <chrono>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <sstream>
-
 namespace MyTools {
 
 namespace FileLogger {
-
-std::ofstream FileLoggerSingletone::logOut;
 
 ILogger& FileLoggerSingletone::getInstance()
 {
