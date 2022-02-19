@@ -13,6 +13,7 @@
 #include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
+#include "Tower.h"
 #include "enums/CraterSize.h"
 
 class Command
@@ -86,7 +87,6 @@ public:
     void Execute() override;
 };
 
-
 class MacroCommand
 {
 private:
@@ -138,7 +138,8 @@ private:
     std::shared_ptr<Plane> FindPlane() const;
     std::shared_ptr<LevelGUI> FindLevelGUI() const;
     std::vector<std::shared_ptr<DestroyableGroundObject>> FindDestoyableGroundObjects() const;
-    std::vector<std::shared_ptr<Bomb>> FindAllBombs() const;
+
+    std::vector<std::shared_ptr<Bomb>> FindAllBombs();
 
 private:
     MacroCommand macroCommand;
@@ -151,5 +152,66 @@ private:
     uint64_t startTime, finishTime, passedTime;
     uint16_t bombsNumber, deltaTime, fps;
     int16_t score;
-};
 
+public:
+    class BombIterator
+    {
+    private:
+      size_t indx;
+      std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
+
+    public:
+      BombIterator(std::vector<std::shared_ptr<DynamicObject>>& avecDynamicObj)
+        :indx(0),vecDynamicObj(avecDynamicObj) {
+        for(;indx < vecDynamicObj.size(); ++indx)
+        {
+          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          {
+            return;
+          }
+        }
+      }
+
+      void reset(){indx = vecDynamicObj.size();}
+
+      BombIterator& operator++() {
+        for(++indx; indx < vecDynamicObj.size(); ++indx)
+        {
+          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          {
+            return *this;
+          }
+        }
+        return *this;
+      }
+
+      bool operator==(BombIterator& it) {
+        if(indx == it.indx) return true;
+        return false;
+      }
+
+      bool operator!=(BombIterator& it) {
+        return !(*this == it);
+      }
+
+      std::shared_ptr<DynamicObject>& operator*() {
+        return vecDynamicObj.at(indx);
+      }
+
+      std::shared_ptr<DynamicObject>& operator->() {
+        return const_cast<std::shared_ptr<DynamicObject>&>(vecDynamicObj.at(indx));
+      }
+
+    };
+
+    BombIterator begin(std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) {
+      return BombIterator(vecDynamicObj);
+    }
+
+    BombIterator end(std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) {
+      BombIterator it{vecDynamicObj};
+      it.reset();
+      return it;
+    }
+
+};

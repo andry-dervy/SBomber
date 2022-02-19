@@ -42,10 +42,11 @@ SBomber::SBomber()
   pTank->SetPos(15, groundY - 1);
   vecStaticObj.push_back(std::move(pTank));
 
-  pTank = std::unique_ptr<Tank>(new Tank);
-  pTank->SetWidth(13);
-  pTank->SetPos(35, groundY - 1);
-  vecStaticObj.push_back(std::move(pTank));
+  std::unique_ptr<Tower> pTower{new Tower};
+  std::unique_ptr<TowerAdapter> pTowerAdapter{new TowerAdapter(std::move(pTower))};
+  pTowerAdapter->SetWidth(13);
+  pTowerAdapter->SetPos(35, groundY - 1);
+  vecStaticObj.push_back(std::move(pTowerAdapter));
 
 
   std::unique_ptr<House> pHouse {new House};
@@ -131,6 +132,7 @@ std::vector<std::shared_ptr<DestroyableGroundObject>> SBomber::FindDestoyableGro
   std::vector<std::shared_ptr<DestroyableGroundObject>> vec;
   for (size_t i = 0; i < vecStaticObj.size(); i++) {
     if (vecStaticObj[i]->ClassID() == "Tank" ||
+        vecStaticObj[i]->ClassID() == "Tower" ||
         vecStaticObj[i]->ClassID() == "House") {
       vec.push_back(std::static_pointer_cast<DestroyableGroundObject>(vecStaticObj[i]));
     }
@@ -149,13 +151,13 @@ std::shared_ptr<Ground> SBomber::FindGround() const {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() const {
+std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() {
   std::vector<std::shared_ptr<Bomb>> vecBombs;
 
-  for (size_t i = 0; i < vecDynamicObj.size(); i++) {
-    if (vecDynamicObj[i]->ClassID() == "Bomb") {
-      vecBombs.push_back(std::static_pointer_cast<Bomb>(vecDynamicObj[i]));
-    }
+  BombIterator it = begin(vecDynamicObj);
+  BombIterator it_end = end(vecDynamicObj);
+  for (; it != it_end; ++it) {
+      vecBombs.push_back(std::static_pointer_cast<Bomb>(*it));
   }
 
   return vecBombs;
