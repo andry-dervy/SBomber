@@ -8,8 +8,8 @@
 
 #include <cassert>
 
-SBomber::SBomber()
-  : exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
+SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
+  : checkImpl(std::move(acheckImpl)), exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
   MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
@@ -89,53 +89,19 @@ void SBomber::MoveObjects() {
 void SBomber::CheckObjects() {
   MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
-  CheckPlaneAndLevelGUI();
-  CheckBombsAndGround();
+  checkImpl->CheckPlaneAndLevelGUI(
+          FindPlane(),
+          FindLevelGUI(),
+          exitFlag);
+  macroCommand.addCommands(
+        checkImpl->CheckBombsAndGround(
+          FindAllBombs(),
+          FindGround(),
+          vecDynamicObj,
+          FindDestoyableGroundObjects(),
+          vecStaticObj,
+          score));
 };
-
-void SBomber::CheckPlaneAndLevelGUI() {
-  if (FindPlane()->GetX() > FindLevelGUI()->GetFinishX()) {
-    exitFlag = true;
-  }
-}
-
-void SBomber::CheckBombsAndGround() {
-  std::vector<std::shared_ptr<Bomb>> vecBombs = FindAllBombs();
-  std::shared_ptr<Ground> pGround = FindGround();
-  const double y = pGround->GetY();
-  for (size_t i = 0; i < vecBombs.size(); i++) {
-    if (vecBombs[i]->GetY() >= y) {
-      pGround->AddCrater(vecBombs[i]->GetX());
-      CheckDestoyableObjects(vecBombs[i]);
-
-      std::unique_ptr<CommandDeleteDynamicObj> pDelDynObj =
-          std::make_unique<CommandDeleteDynamicObj>(
-            vecBombs[i], vecDynamicObj
-            );
-      macroCommand.addCommand(std::move(pDelDynObj));
-    }
-  }
-}
-
-void SBomber::CheckDestoyableObjects(std::shared_ptr<Bomb> pBomb) {
-  std::vector<std::shared_ptr<DestroyableGroundObject>> vecDestoyableObjects =
-      FindDestoyableGroundObjects();
-  const double size = pBomb->GetWidth();
-  const double size_2 = size / 2;
-  for (size_t i = 0; i < vecDestoyableObjects.size(); i++) {
-    const double x1 = pBomb->GetX() - size_2;
-    const double x2 = x1 + size;
-    if (vecDestoyableObjects[i]->isInside(x1, x2)) {
-      score += vecDestoyableObjects[i]->GetScore();
-
-      std::unique_ptr<CommandDeleteStaticObj> pComDelStatObj =
-          std::make_unique<CommandDeleteStaticObj>(
-            vecDestoyableObjects[i], vecStaticObj
-            );
-      macroCommand.addCommand(std::move(pComDelStatObj));
-    }
-  }
-}
 
 std::vector<std::shared_ptr<DestroyableGroundObject>> SBomber::FindDestoyableGroundObjects() const {
   std::vector<std::shared_ptr<DestroyableGroundObject>> vec;
@@ -160,7 +126,7 @@ std::shared_ptr<Ground> SBomber::FindGround() const {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() const {
+std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() {
   std::vector<std::shared_ptr<Bomb>> vecBombs;
 
   BombIterator it = begin(vecDynamicObj);
@@ -388,4 +354,60 @@ void CommandDropBombDecorator::Execute() {
     bombsNumber--;
     score -= Bomb::BombCost;
   }
+}
+
+void ConcreteCheckImpl::CheckPlaneAndLevelGUI(
+    std::shared_ptr<Plane> plane, std::shared_ptr<LevelGUI> levelGui, bool& exitFlag) {
+  if (plane->GetX() > levelGui->GetFinishX()) {
+    exitFlag = true;
+  }
+}
+
+std::unique_ptr<MacroCommand> ConcreteCheckImpl::CheckBombsAndGround (
+    std::vector<std::shared_ptr<Bomb>> vecBombs,
+    const std::shared_ptr<Ground>& pGround,
+    std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
+    const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+    std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+    int16_t& score) {
+  std::unique_ptr<MacroCommand> macroCommand = std::make_unique<MacroCommand>();
+  const double y = pGround->GetY();
+  for (size_t i = 0; i < vecBombs.size(); i++) {
+    if (vecBombs[i]->GetY() >= y) {
+      pGround->AddCrater(vecBombs[i]->GetX());
+
+      macroCommand->addCommands(CheckDestroyableObjects(vecBombs[i],vecDestoyableObjects,vecStaticObj,score));
+
+      std::unique_ptr<CommandDeleteDynamicObj> pDelDynObj =
+          std::make_unique<CommandDeleteDynamicObj>(
+            vecBombs[i], vecDynamicObj
+            );
+      macroCommand->addCommand(std::move(pDelDynObj));
+    }
+  }
+  return macroCommand;
+}
+
+std::unique_ptr<MacroCommand> ConcreteCheckImpl::CheckDestroyableObjects(
+    std::shared_ptr<Bomb> pBomb,
+    const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+    std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+    int16_t& score) {
+  std::unique_ptr<MacroCommand> macroCommand = std::make_unique<MacroCommand>();
+  const double size = pBomb->GetWidth();
+  const double size_2 = size / 2;
+  for (size_t i = 0; i < vecDestoyableObjects.size(); i++) {
+    const double x1 = pBomb->GetX() - size_2;
+    const double x2 = x1 + size;
+    if (vecDestoyableObjects[i]->isInside(x1, x2)) {
+      score += vecDestoyableObjects[i]->GetScore();
+
+      std::unique_ptr<CommandDeleteStaticObj> pComDelStatObj =
+          std::make_unique<CommandDeleteStaticObj>(
+            vecDestoyableObjects[i], vecStaticObj
+            );
+      macroCommand->addCommand(std::move(pComDelStatObj));
+    }
+  }
+  return macroCommand;
 }
