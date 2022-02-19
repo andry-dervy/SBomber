@@ -11,3 +11,19 @@ void Bomb::Draw() const {
 std::string Bomb::ClassID() const {
   return "Bomb";
 }
+
+void BombDecorator::Draw() const {
+  ScreenSingleton::getInstance().GotoXY(x, y-1);
+  std::cout << "|";
+  bomb->Draw();
+}
+
+std::string BombDecorator::ClassID() const {
+  return bomb->ClassID();
+}
+
+void BombDecorator::Move(uint16_t time)
+{
+  bomb->Move(1.5 * time);
+  SetPos(bomb->GetX(),bomb->GetY());
+};
