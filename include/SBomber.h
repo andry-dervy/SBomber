@@ -138,7 +138,8 @@ private:
     std::shared_ptr<Plane> FindPlane() const;
     std::shared_ptr<LevelGUI> FindLevelGUI() const;
     std::vector<std::shared_ptr<DestroyableGroundObject>> FindDestoyableGroundObjects() const;
-    std::vector<std::shared_ptr<Bomb>> FindAllBombs() const;
+
+    std::vector<std::shared_ptr<Bomb>> FindAllBombs();
 
 private:
     MacroCommand macroCommand;
@@ -157,10 +158,10 @@ public:
     {
     private:
       size_t indx;
-      const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
+      std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
 
     public:
-      BombIterator(const std::vector<std::shared_ptr<DynamicObject>> &avecDynamicObj)
+      BombIterator(std::vector<std::shared_ptr<DynamicObject>>& avecDynamicObj)
         :indx(0),vecDynamicObj(avecDynamicObj) {
         for(;indx < vecDynamicObj.size(); ++indx)
         {
@@ -194,7 +195,7 @@ public:
       }
 
       std::shared_ptr<DynamicObject>& operator*() {
-        return const_cast<std::shared_ptr<DynamicObject>&>(vecDynamicObj.at(indx));
+        return vecDynamicObj.at(indx);
       }
 
       std::shared_ptr<DynamicObject>& operator->() {
@@ -203,11 +204,11 @@ public:
 
     };
 
-    BombIterator begin(const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) const {
+    BombIterator begin(std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) {
       return BombIterator(vecDynamicObj);
     }
 
-    BombIterator end(const std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) const {
+    BombIterator end(std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj) {
       BombIterator it{vecDynamicObj};
       it.reset();
       return it;

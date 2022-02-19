@@ -151,7 +151,7 @@ std::shared_ptr<Ground> SBomber::FindGround() const {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() const {
+std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() {
   std::vector<std::shared_ptr<Bomb>> vecBombs;
 
   BombIterator it = begin(vecDynamicObj);
