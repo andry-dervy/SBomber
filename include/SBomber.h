@@ -1,6 +1,7 @@
 #pragma once
 
-#include <list>
+//#include <list>
+#include <queue>
 #include <memory>
 
 #include "LevelGUI.h"
@@ -85,7 +86,7 @@ public:
 class MacroCommand
 {
 private:
-  std::list<std::unique_ptr<Command>> fifoCommands;
+  std::queue<std::unique_ptr<Command>> fifoCommands;
 
 public:
   MacroCommand() = default;
@@ -93,16 +94,17 @@ public:
 
   void addCommand(std::unique_ptr<Command>&& command)
   {
-    fifoCommands.push_back(std::move(command));
+    fifoCommands.push(std::move(command));
   }
 
   void Run()
   {
-    for(auto& command: fifoCommands)
+    while(!fifoCommands.empty())
     {
+      auto& command = fifoCommands.front();
       command->Execute();
+      fifoCommands.pop();
     }
-    fifoCommands.clear();
   }
 };
 
