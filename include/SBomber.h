@@ -15,6 +15,7 @@
 #include "Ground.h"
 #include "Tank.h"
 #include "Tower.h"
+#include "Visitor.h"
 #include "enums/CraterSize.h"
 
 class Command
@@ -129,14 +130,14 @@ public:
       std::shared_ptr<LevelGUI> levelGui,
       bool& exitFlag) = 0;
   virtual std::unique_ptr<MacroCommand> CheckBombsAndGround(
-      std::vector<std::shared_ptr<Bomb>> vecBombs,
+      std::vector<std::shared_ptr<DynamicObject>> vecBombs,
       const std::shared_ptr<Ground>& pGround,
       std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
       const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) = 0;
   virtual   std::unique_ptr<MacroCommand> CheckDestroyableObjects(
-      std::shared_ptr<Bomb> pBomb,
+      std::shared_ptr<DynamicObject> pBomb,
       const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) = 0;
@@ -152,14 +153,14 @@ public:
       std::shared_ptr<LevelGUI> levelGui,
       bool& exitFlag) override;
   std::unique_ptr<MacroCommand> CheckBombsAndGround(
-      std::vector<std::shared_ptr<Bomb>> vecBombs,
+      std::vector<std::shared_ptr<DynamicObject>> vecBombs,
       const std::shared_ptr<Ground>& pGround,
       std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
       const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) override;
   std::unique_ptr<MacroCommand> CheckDestroyableObjects(
-      std::shared_ptr<Bomb> pBomb,
+      std::shared_ptr<DynamicObject> pBomb,
       const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) override;
@@ -191,11 +192,13 @@ private:
     std::shared_ptr<Plane> FindPlane() const;
     std::shared_ptr<LevelGUI> FindLevelGUI() const;
     std::vector<std::shared_ptr<DestroyableGroundObject>> FindDestoyableGroundObjects() const;
-    std::vector<std::shared_ptr<Bomb>> FindAllBombs();
+    std::vector<std::shared_ptr<DynamicObject>> FindAllBombs();
 
 private:
     std::unique_ptr<ICheckImpl> checkImpl;
     MacroCommand macroCommand;
+    LogVisitor logDynObjects;
+
 
     std::vector<std::shared_ptr<DynamicObject>> vecDynamicObj;
     std::vector<std::shared_ptr<GameObject>> vecStaticObj;
@@ -218,7 +221,8 @@ public:
         :indx(0),vecDynamicObj(avecDynamicObj) {
         for(;indx < vecDynamicObj.size(); ++indx)
         {
-          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          if(vecDynamicObj[indx]->ClassID() == "Bomb" ||
+             vecDynamicObj[indx]->ClassID() == "BombDecorator")
           {
             return;
           }
@@ -230,7 +234,8 @@ public:
       BombIterator& operator++() {
         for(++indx; indx < vecDynamicObj.size(); ++indx)
         {
-          if(vecDynamicObj[indx]->ClassID() == "Bomb")
+          if(vecDynamicObj[indx]->ClassID() == "Bomb"||
+             vecDynamicObj[indx]->ClassID() == "BombDecorator")
           {
             return *this;
           }

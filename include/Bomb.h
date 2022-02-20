@@ -2,18 +2,19 @@
 
 #include <memory>
 #include "DynamicObject.h"
+#include "Visitor.h"
 
 class Bomb : public DynamicObject
 {
 public:
-
   static const uint16_t BombCost = 10;
 
-	void Draw() const override;
+public:
+  void Draw() const override;
   std::string ClassID() const override;
+  void Accept(const Visitor& v) {v.log(*this);}
 
 private:
-
 };
 
 class BombDecorator : public DynamicObject
@@ -28,6 +29,9 @@ public:
     SetWidth(bomb->GetWidth());
   }
   ~BombDecorator() = default;
+  double GetSpeed() const {return bomb->GetSpeed();}
+  void Accept(const Visitor& v) {v.log(*bomb);}
+
 public:
   void Draw() const override;
   std::string ClassID() const override;

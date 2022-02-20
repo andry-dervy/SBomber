@@ -14,6 +14,8 @@ set(SOURCES
 
     include/DestroyableGroundObject.h
     include/DynamicObject.h
+    src/DynamicObject.cpp
+
     include/GameObject.h
 
     include/House.h
@@ -51,6 +53,9 @@ set(SOURCES
 
     include/Tower.h
     src/Tower.cpp
+
+    include/Visitor.h
+    src/Visitor.cpp
 )
 
 add_executable(SBomber

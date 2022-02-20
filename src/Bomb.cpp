@@ -19,11 +19,13 @@ void BombDecorator::Draw() const {
 }
 
 std::string BombDecorator::ClassID() const {
-  return bomb->ClassID();
+  return "BombDecorator";
 }
 
 void BombDecorator::Move(uint16_t time)
 {
   bomb->Move(1.5 * time);
   SetPos(bomb->GetX(),bomb->GetY());
+  auto dir = bomb->GetDirection();
+  SetDirection(dir.first,dir.second);
 };

@@ -82,6 +82,12 @@ void SBomber::MoveObjects() {
   for (size_t i = 0; i < vecDynamicObj.size(); i++) {
     if (vecDynamicObj[i] != nullptr) {
       vecDynamicObj[i]->Move(deltaTime);
+      if(vecDynamicObj[i]->ClassID() == "Bomb")
+        logDynObjects.log(*(std::dynamic_pointer_cast<Bomb>(vecDynamicObj[i])));
+      else if(vecDynamicObj[i]->ClassID() == "BombDecorator")
+        logDynObjects.log(*(std::dynamic_pointer_cast<BombDecorator>(vecDynamicObj[i])));
+      else if(vecDynamicObj[i]->ClassID() == "Plane")
+        logDynObjects.log(*(std::dynamic_pointer_cast<Plane>(vecDynamicObj[i])));
     }
   }
 };
@@ -126,13 +132,13 @@ std::shared_ptr<Ground> SBomber::FindGround() const {
   return nullptr;
 }
 
-std::vector<std::shared_ptr<Bomb>> SBomber::FindAllBombs() {
-  std::vector<std::shared_ptr<Bomb>> vecBombs;
+std::vector<std::shared_ptr<DynamicObject>> SBomber::FindAllBombs() {
+  std::vector<std::shared_ptr<DynamicObject>> vecBombs;
 
   BombIterator it = begin(vecDynamicObj);
   BombIterator it_end = end(vecDynamicObj);
   for (; it != it_end; ++it) {
-      vecBombs.push_back(std::static_pointer_cast<Bomb>(*it));
+      vecBombs.push_back(*it);
   }
 
   return vecBombs;
@@ -364,7 +370,7 @@ void ConcreteCheckImpl::CheckPlaneAndLevelGUI(
 }
 
 std::unique_ptr<MacroCommand> ConcreteCheckImpl::CheckBombsAndGround (
-    std::vector<std::shared_ptr<Bomb>> vecBombs,
+    std::vector<std::shared_ptr<DynamicObject>> vecBombs,
     const std::shared_ptr<Ground>& pGround,
     std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
     const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
@@ -389,7 +395,7 @@ std::unique_ptr<MacroCommand> ConcreteCheckImpl::CheckBombsAndGround (
 }
 
 std::unique_ptr<MacroCommand> ConcreteCheckImpl::CheckDestroyableObjects(
-    std::shared_ptr<Bomb> pBomb,
+    std::shared_ptr<DynamicObject> pBomb,
     const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
     std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
     int16_t& score) {
