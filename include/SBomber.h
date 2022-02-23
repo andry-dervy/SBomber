@@ -1,8 +1,8 @@
 #pragma once
 
-//#include <list>
 #include <queue>
 #include <memory>
+#include <iostream>
 
 #include "MyTools.h"
 #include "ScreenSingleton.h"
@@ -100,6 +100,15 @@ public:
     fifoCommands.push(std::move(command));
   }
 
+  void addCommands(std::unique_ptr<MacroCommand> command)
+  {
+    while(!command->fifoCommands.empty())
+    {
+      fifoCommands.push(std::move(command->fifoCommands.front()));
+      command->fifoCommands.pop();
+    }
+  }
+
   void Run()
   {
     while(!fifoCommands.empty())
@@ -111,11 +120,58 @@ public:
   }
 };
 
+//CheckBridge
+class ICheckImpl
+{
+public:
+  virtual ~ICheckImpl() {};
+
+  virtual void CheckPlaneAndLevelGUI(
+      std::shared_ptr<Plane> plane,
+      std::shared_ptr<LevelGUI> levelGui,
+      bool& exitFlag) = 0;
+  virtual std::unique_ptr<MacroCommand> CheckBombsAndGround(
+      std::vector<std::shared_ptr<Bomb>> vecBombs,
+      const std::shared_ptr<Ground>& pGround,
+      std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
+      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+      int16_t& score) = 0;
+  virtual   std::unique_ptr<MacroCommand> CheckDestroyableObjects(
+      std::shared_ptr<Bomb> pBomb,
+      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+      int16_t& score) = 0;
+};
+
+class ConcreteCheckImpl : public ICheckImpl
+{
+public:
+  virtual ~ConcreteCheckImpl(){}
+
+  void CheckPlaneAndLevelGUI(
+      std::shared_ptr<Plane> plane,
+      std::shared_ptr<LevelGUI> levelGui,
+      bool& exitFlag) override;
+  std::unique_ptr<MacroCommand> CheckBombsAndGround(
+      std::vector<std::shared_ptr<Bomb>> vecBombs,
+      const std::shared_ptr<Ground>& pGround,
+      std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
+      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+      int16_t& score) override;
+  std::unique_ptr<MacroCommand> CheckDestroyableObjects(
+      std::shared_ptr<Bomb> pBomb,
+      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
+      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
+      int16_t& score) override;
+};
+
 class SBomber
 {
 public:
 
-    SBomber();
+    SBomber(std::unique_ptr<ICheckImpl> acheckImpl);
     ~SBomber();
     
     inline bool GetExitFlag() const { return exitFlag; }
@@ -130,18 +186,17 @@ public:
     void RunCommands();
 
 private:
-    void CheckPlaneAndLevelGUI();
-    void CheckBombsAndGround();
-    void  CheckDestoyableObjects(std::shared_ptr<Bomb> pBomb);
+    uint32_t getKeyCode(int amountInputtedCodes);
+    TypeHouse EnterTypeHouse();
 
     std::shared_ptr<Ground> FindGround() const;
     std::shared_ptr<Plane> FindPlane() const;
     std::shared_ptr<LevelGUI> FindLevelGUI() const;
     std::vector<std::shared_ptr<DestroyableGroundObject>> FindDestoyableGroundObjects() const;
-
     std::vector<std::shared_ptr<Bomb>> FindAllBombs();
 
 private:
+    std::unique_ptr<ICheckImpl> checkImpl;
     MacroCommand macroCommand;
 
     std::vector<std::shared_ptr<DynamicObject>> vecDynamicObj;

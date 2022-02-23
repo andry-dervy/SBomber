@@ -1,4 +1,4 @@
-﻿#include "SBomber.h"
+#include "SBomber.h"
 #include "MyTools.h"
 #include "ScreenSingleton.h"
 
@@ -37,7 +37,7 @@ int _kbhit() {
 int main(void) {
   MyTools::LoggerSingleton::getInstance().OpenLogFile("log.txt");
 
-  SBomber game;
+  SBomber game(std::make_unique<ConcreteCheckImpl>());
 
   do {
     game.TimeStart();
