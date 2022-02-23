@@ -3,7 +3,14 @@
 #include <cstdint>
 #include <string>
 
-class GameObject {
+class Observer
+{
+public:
+  virtual ~Observer() = default;
+  virtual bool HandleInsideCheck(double x1, double x2) = 0;
+};
+
+class GameObject: public Observer {
 public:
   GameObject() : x(0.0), y(0.0), width(0) {}
   virtual ~GameObject() = default;
@@ -21,6 +28,10 @@ public:
 
   inline void SetWidth(uint16_t widthN) { width = widthN; }
   inline uint16_t GetWidth() const { return width; }
+
+  bool HandleInsideCheck(double x1, double x2) override {
+    return false;
+  }
 
 protected:
   double x, y;

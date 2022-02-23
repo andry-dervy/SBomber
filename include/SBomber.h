@@ -58,17 +58,20 @@ class CommandDropBomb: public Command
 public:
     CommandDropBomb(std::shared_ptr<const Plane> pPlane,
                     std::vector<std::shared_ptr<DynamicObject>>& avecDynamicObj,
+                    std::vector<std::shared_ptr<DestroyableGroundObject>> avecDestrGroundObj,
                     uint16_t& aBombsNumber,
                     int16_t& aScore,
                     double aSpeedBomb = 1,
                     uint16_t aWidthCrater = SMALL_CRATER_SIZE)
-      : plane{pPlane}, vecDynamicObj{avecDynamicObj}, bombsNumber{aBombsNumber},
+      : plane{pPlane}, vecDynamicObj{avecDynamicObj},
+        vecDestrGroundObj{avecDestrGroundObj}, bombsNumber{aBombsNumber},
         score{aScore}, speedBomb{aSpeedBomb}, widthCrater{aWidthCrater} {}
     void Execute() override;
 
 protected:
     std::shared_ptr<const Plane> plane;
     std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj;
+    std::vector<std::shared_ptr<DestroyableGroundObject>> vecDestrGroundObj;
     uint16_t& bombsNumber;
     int16_t& score;
     double speedBomb;
@@ -80,11 +83,12 @@ class CommandDropBombDecorator: public CommandDropBomb
 public:
     CommandDropBombDecorator(std::shared_ptr<const Plane> pPlane,
                     std::vector<std::shared_ptr<DynamicObject>>& avecDynamicObj,
+                    std::vector<std::shared_ptr<DestroyableGroundObject>> avecDestrGroundObj,
                     uint16_t& aBombsNumber,
                     int16_t& aScore,
                     double aSpeedBomb = 1,
                     uint16_t aWidthCrater = SMALL_CRATER_SIZE)
-      : CommandDropBomb{pPlane,avecDynamicObj,aBombsNumber,
+      : CommandDropBomb{pPlane,avecDynamicObj,avecDestrGroundObj,aBombsNumber,
         aScore, aSpeedBomb, aWidthCrater} {}
     void Execute() override;
 };
@@ -133,12 +137,6 @@ public:
       std::vector<std::shared_ptr<DynamicObject>> vecBombs,
       const std::shared_ptr<Ground>& pGround,
       std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
-      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
-      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
-      int16_t& score) = 0;
-  virtual   std::unique_ptr<MacroCommand> CheckDestroyableObjects(
-      std::shared_ptr<DynamicObject> pBomb,
-      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) = 0;
 };
@@ -156,12 +154,6 @@ public:
       std::vector<std::shared_ptr<DynamicObject>> vecBombs,
       const std::shared_ptr<Ground>& pGround,
       std::vector<std::shared_ptr<DynamicObject>>& vecDynamicObj,
-      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
-      std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
-      int16_t& score) override;
-  std::unique_ptr<MacroCommand> CheckDestroyableObjects(
-      std::shared_ptr<DynamicObject> pBomb,
-      const std::vector<std::shared_ptr<DestroyableGroundObject>>& vecDestoyableObjects,
       std::vector<std::shared_ptr<GameObject>>& vecStaticObj,
       int16_t& score) override;
 };
