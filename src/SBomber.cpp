@@ -7,13 +7,31 @@
 #endif
 
 #include <cassert>
+#include <chrono>
+#include <random>
+
+int getRandomNum(int min, int max)
+{
+  const static auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+  static std::mt19937_64 generator(seed);
+  std::uniform_int_distribution<int> dis(min, max);
+  return dis(generator);
+}
 
 SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
   : checkImpl(std::move(acheckImpl)), exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
   MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
-  std::unique_ptr<Plane> pPlane {new Plane};
+  std::unique_ptr<Plane> pPlane;
+  if(getRandomNum(0,100)%2)
+  {
+      pPlane = std::make_unique<ColorPlane>();
+  }
+  else
+  {
+      pPlane = std::make_unique<BigPlane>();
+  }
   pPlane->SetDirection(1, 0.1);
   pPlane->SetSpeed(4);
   pPlane->SetPos(5, 10);
