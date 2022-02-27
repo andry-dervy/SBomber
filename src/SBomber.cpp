@@ -19,7 +19,8 @@ SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
   pPlane->SetPos(5, 10);
   vecDynamicObj.push_back(std::move(pPlane));
 
-  std::unique_ptr<LevelGUI> pGUI {new LevelGUI};
+  std::shared_ptr<Mediator> mediator = std::make_shared<Mediator>();
+  std::shared_ptr<LevelGUI> pGUI {new LevelGUI};
   pGUI->SetParam(passedTime, fps, bombsNumber, score);
   const uint16_t maxX = ScreenSingleton::getInstance().GetMaxX();
   const uint16_t maxY = ScreenSingleton::getInstance().GetMaxY();
@@ -29,6 +30,8 @@ SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
   pGUI->SetWidth(width);
   pGUI->SetHeight(maxY - 4);
   pGUI->SetFinishX(offset + width - 4);
+  mediator->addLevelGUI(pGUI);
+  pGUI->addMediator(mediator);
   vecStaticObj.push_back(std::move(pGUI));
 
   std::unique_ptr<Ground> pGr {new Ground};
@@ -37,9 +40,11 @@ SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
   pGr->SetWidth(width - 2);
   vecStaticObj.push_back(std::move(pGr));
 
-  std::unique_ptr<Tank> pTank{new Tank};
+  std::shared_ptr<Tank> pTank{new Tank};
   pTank->SetWidth(13);
   pTank->SetPos(15, groundY - 1);
+  mediator->addTank(pTank);
+  pTank->addMediator(mediator);
   vecStaticObj.push_back(std::move(pTank));
 
   std::unique_ptr<Tower> pTower{new Tower};
@@ -270,7 +275,9 @@ void SBomber::DrawFrame() {
   ScreenSingleton::getInstance().GotoXY(0, 0);
   fps++;
 
-  FindLevelGUI()->SetParam(passedTime, fps, bombsNumber, score);
+  std::shared_ptr<LevelGUI> gui = FindLevelGUI();
+  gui->SetParam(passedTime, fps, bombsNumber, score);
+  gui->newTankMessage();
 }
 
 void SBomber::TimeStart() {
@@ -291,6 +298,19 @@ void SBomber::TimeFinish() {
 void SBomber::RunCommands()
 {
   macroCommand.Run();
+}
+
+void SBomber::TankMessage()
+{
+    for(auto& a: vecStaticObj)
+    {
+        if(a->ClassID() == "Tank")
+        {
+            std::shared_ptr<Tank> tank =
+                    std::dynamic_pointer_cast<Tank>(a);
+            tank->sendMessage();
+        }
+    }
 }
 
 void CommandDeleteDynamicObj::Execute()

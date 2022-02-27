@@ -50,6 +50,7 @@ int main(void) {
     game.MoveObjects();
     game.CheckObjects();
     game.RunCommands();
+    game.TankMessage();
 
     game.TimeFinish();
 

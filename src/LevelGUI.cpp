@@ -37,15 +37,44 @@ void LevelGUI::Draw() const
     std::cout << "BombsNum: " << bombsNumber;
     ScreenSingleton::getInstance().GotoXY(62, 1);
     std::cout << "Score: " << score;
+
+    if(tankmes != nullptr)
+    {
+        ScreenSingleton::getInstance().GotoXY(
+                    tankmes->x, tankmes->y);
+        std::cout << tankmes->text;
+    }
 }
 
 std::string LevelGUI::ClassID() const {
   return "LevelGUI";
 }
+
 void  LevelGUI::SetParam(uint64_t passedTimeNew, uint64_t fpsNew, uint16_t bombsNumberNew, int16_t scoreNew)
 {
     passedTime = passedTimeNew;
     fps = fpsNew;
     bombsNumber = bombsNumberNew;
     score = scoreNew;
+}
+
+void LevelGUI::newTankMessage()
+{
+    uint64_t time_now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+    if((time_now - passedTimeTankMes) > 3000)
+    {
+        passedTimeTankMes = std::chrono::duration_cast<std::chrono::milliseconds>(
+                               std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+
+        if(!qmessages.empty())
+        {
+            tankmes = std::move(qmessages.front());
+            qmessages.pop();
+        }
+        else
+        {
+            tankmes = nullptr;
+        }
+    }
 }
