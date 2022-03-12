@@ -31,6 +31,9 @@ set(SOURCES
     include/SBomber.h
     src/SBomber.cpp
 
+    include/SBomberPimpl.h
+    src/SBomberPimpl.cpp
+
     include/Tank.h
     src/Tank.cpp
 
