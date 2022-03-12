@@ -184,6 +184,7 @@ public:
     void MoveObjects();
     void CheckObjects();
     void RunCommands();
+    void TankMessage();
 
 private:
     uint32_t getKeyCode(int amountInputtedCodes);
