@@ -370,7 +370,12 @@ void CommandDropBomb::Execute() {
     pBomb->SetPos(x, y);
     pBomb->SetWidth(widthCrater);
 
+    std::shared_ptr<Bomb> pBombClone =
+            std::static_pointer_cast<Bomb>(pBomb->clone());
+    pBombClone->SetPos(pBombClone->GetX() - 1,pBombClone->GetY() - 1);
+
     vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBomb));
+    vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBombClone));
     bombsNumber--;
     score -= Bomb::BombCost;
   }
