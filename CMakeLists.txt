@@ -57,6 +57,9 @@ set(SOURCES
 
     include/Mediator.h
     src/Mediator.cpp
+
+    include/Tree.h
+    src/Tree.cpp
 )
 
 add_executable(SBomber

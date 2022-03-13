@@ -3,26 +3,33 @@
 #include <memory>
 #include "DynamicObject.h"
 
-class Bomb : public DynamicObject
+class Prototype
+{
+public:
+    virtual ~Prototype() = default;
+    virtual std::shared_ptr<DynamicObject> clone() = 0;
+};
+
+class Bomb : public DynamicObject, Prototype
 {
 public:
 
-  static const uint16_t BombCost = 10;
+    static const uint16_t BombCost = 10;
 
 	void Draw() const override;
-  std::string ClassID() const override;
-
+    std::string ClassID() const override;
+    std::shared_ptr<DynamicObject> clone() override;
 private:
 
 };
 
-class BombDecorator : public DynamicObject
+class BombDecorator : public DynamicObject, Prototype
 {
 private:
-  std::unique_ptr<Bomb> bomb;
+  std::shared_ptr<Bomb> bomb;
 
 public:
-  BombDecorator(std::unique_ptr<Bomb>&& aBomb)
+  BombDecorator(std::shared_ptr<Bomb>&& aBomb)
     :bomb(std::move(aBomb))
   {
     SetWidth(bomb->GetWidth());
@@ -32,4 +39,5 @@ public:
   void Draw() const override;
   std::string ClassID() const override;
   void Move(uint16_t time) override;
+  std::shared_ptr<DynamicObject> clone() override;
 };

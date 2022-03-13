@@ -23,20 +23,6 @@ SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
     fps(0), bombsNumber(10), score(0) {
   MyTools::LoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
-  std::unique_ptr<Plane> pPlane;
-  if(getRandomNum(0,100)%2)
-  {
-      pPlane = std::make_unique<ColorPlane>();
-  }
-  else
-  {
-      pPlane = std::make_unique<BigPlane>();
-  }
-  pPlane->SetDirection(1, 0.1);
-  pPlane->SetSpeed(4);
-  pPlane->SetPos(5, 10);
-  vecDynamicObj.push_back(std::move(pPlane));
-
   std::shared_ptr<Mediator> mediator = std::make_shared<Mediator>();
   std::shared_ptr<LevelGUI> pGUI {new LevelGUI};
   pGUI->SetParam(passedTime, fps, bombsNumber, score);
@@ -57,6 +43,24 @@ SBomber::SBomber(std::unique_ptr<ICheckImpl> acheckImpl)
   pGr->SetPos(offset + 1, groundY);
   pGr->SetWidth(width - 2);
   vecStaticObj.push_back(std::move(pGr));
+
+  std::unique_ptr<Plane> pPlane;
+  if(getRandomNum(0,100)%2)
+  {
+      pPlane = std::make_unique<ColorPlane>();
+  }
+  else
+  {
+      pPlane = std::make_unique<BigPlane>();
+  }
+  pPlane->SetDirection(1, 0.1);
+  pPlane->SetSpeed(4);
+  pPlane->SetPos(5, 10);
+  vecDynamicObj.push_back(std::move(pPlane));
+
+  std::unique_ptr<Tree> pTree = std::make_unique<Tree>();
+  pTree->SetPos(5, groundY - 1);
+  vecDynamicObj.push_back(std::move(pTree));
 
   std::shared_ptr<Tank> pTank{new Tank};
   pTank->SetWidth(13);
@@ -366,7 +370,12 @@ void CommandDropBomb::Execute() {
     pBomb->SetPos(x, y);
     pBomb->SetWidth(widthCrater);
 
+    std::shared_ptr<Bomb> pBombClone =
+            std::static_pointer_cast<Bomb>(pBomb->clone());
+    pBombClone->SetPos(pBombClone->GetX() - 1,pBombClone->GetY() - 1);
+
     vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBomb));
+    vecDynamicObj.push_back(std::static_pointer_cast<DynamicObject>(pBombClone));
     bombsNumber--;
     score -= Bomb::BombCost;
   }
